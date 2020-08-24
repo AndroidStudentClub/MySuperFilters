@@ -1,5 +1,7 @@
 package ru.androidschool.mysuperfilters
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +9,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.net.URL
 
 class ThumbnailsAdapter(
     private val thumbnailItemList: List<FilterItem>,
@@ -14,7 +21,7 @@ class ThumbnailsAdapter(
 ) :
     RecyclerView.Adapter<ThumbnailsAdapter.MyViewHolder>() {
     private var selectedIndex = 0
-
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     class MyViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         internal var image: ImageView = v.findViewById(R.id.thumbnail)
@@ -36,7 +43,9 @@ class ThumbnailsAdapter(
     ) {
         val thumbnailItem: FilterItem = thumbnailItemList[position]
         thumbnailItem.imageUrl?.let {
-            // TODO
+            coroutineScope.launch(Dispatchers.Main) {
+                holder.image.setImageBitmap(ImageLoader.getOriginalBitmapAsync(it))
+            }
         }
 
         holder.image.setOnClickListener {
